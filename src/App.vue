@@ -3,22 +3,21 @@
     <h1>🌍 Weltkarte (statisch)</h1>
 
     <l-map
-      style="height: 700px; width: 100%; border-radius: 12px; overflow: hidden;"
-      :zoom="2"
-      :center="[45, 0]"
-      :options="mapOptions"
-    >
-      <l-tile-layer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution=""
-      />
-    </l-map>
+  style="height: 700px; width: 100%; border-radius: 12px; overflow: hidden;"
+  :zoom="2"
+  :center="[45, 0]"
+  :options="mapOptions"
+>
+  <l-geo-json :geojson="geojson" :options-style="geojsonOptions" />
+</l-map>
   </div>
 </template>
 
 <script setup>
+import { ref } from "vue"
 import L from "leaflet"
-import { LMap, LTileLayer } from "@vue-leaflet/vue-leaflet"
+import { LGeoJson, LMap, LTileLayer } from "@vue-leaflet/vue-leaflet"
+import geojson from "./assets/world.geo.json"
 
 const mapOptions = {
   zoomControl: false,
@@ -30,6 +29,13 @@ const mapOptions = {
   boxZoom: false,
   attributionControl: false,
 }
+
+const geojsonOptions = () => ({
+    fillColor: "#C4D624",
+    weight: 1,
+    color: "#C4D624",
+    fillOpacity: 1,
+})
 </script>
 
 <style>
@@ -44,5 +50,9 @@ body {
   width: 1000px;
   margin-top: 60px;
   text-align: center;
+}
+
+.leaflet-container {
+  background: #ffffff !important;
 }
 </style>
