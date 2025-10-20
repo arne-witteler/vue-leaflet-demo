@@ -7,9 +7,10 @@
     </button>
 
     <l-map
+  ref="mapRef"
   style="height: 700px; width: 100%; border-radius: 12px; overflow: hidden;"
-  :zoom="2"
-  :center="[45, 0]"
+  :zoom="zoom"
+  :center="center"
   :options="mapOptions"
 >
   <l-geo-json :geojson="geojson" :options-style="geojsonOptions" />
@@ -34,12 +35,30 @@ const mapOptions = {
   attributionControl: false,
 }
 
+const mapRef = ref(null)
+const isGermanyView = ref(false)
+const zoom = ref(2)
+const center = ref([45, 0])
+
 const geojsonOptions = () => ({
     fillColor: "#C4D624",
     weight: 1,
     color: "#C4D624",
     fillOpacity: 1,
 })
+
+function toggleView() {
+  const map = mapRef.value?.leafletObject
+  isGermanyView.value = !isGermanyView.value
+
+  if (map) {
+    if (isGermanyView.value) {
+      map.flyTo([51, 10], 6, { duration: 1 })
+    } else {
+      map.flyTo([45, 0], 2, { duration: 1 })
+    }
+  }
+}
 </script>
 
 <style>
