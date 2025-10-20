@@ -2,6 +2,10 @@
   <div id="app">
     <h1>🌍 Weltkarte (statisch)</h1>
 
+    <button class="toggle-button" @click="toggleView">
+      {{ isGermanyView ? "Weltansicht" : "Deutschlandansicht" }}
+    </button>
+
     <l-map
   style="height: 700px; width: 100%; border-radius: 12px; overflow: hidden;"
   :zoom="2"
@@ -54,5 +58,20 @@ body {
 
 .leaflet-container {
   background: #ffffff !important;
+}
+
+.toggle-button {
+  margin-bottom: 20px;
+  background-color: #c4d624;
+  border: none;
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.toggle-button:hover {
+  background-color: #d8e85a;
 }
 </style>
