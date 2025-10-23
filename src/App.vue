@@ -1,9 +1,9 @@
 <template>
   <div id="app">
-    <h1>🌍 Weltkarte (statisch)</h1>
+    <h1>{{ isGermanyView ? "Germany" : "🌍 World Map" }}</h1>
 
     <button class="toggle-button" @click="toggleView">
-      {{ isGermanyView ? "Weltansicht" : "Deutschlandansicht" }}
+      {{ isGermanyView ? "World View" : "Germany View" }}
     </button>
 
     <l-map
@@ -12,17 +12,19 @@
   :zoom="zoom"
   :center="center"
   :options="mapOptions"
+  @zoom="onZoom"
+  @zoomend="onZoomEnd"
 >
-  <l-geo-json :geojson="geojson" :options-style="geojsonOptions" :key="isGermanyView" />
+  <l-geo-json :geojson="world" :options-style="geojsonOptions" :key="isGermanyView" />
 </l-map>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue"
-import L from "leaflet"
-import { LGeoJson, LMap, LTileLayer } from "@vue-leaflet/vue-leaflet"
-import geojson from "./assets/world.geo.json"
+import { LGeoJson, LMap } from "@vue-leaflet/vue-leaflet"
+import world from "./assets/world.geo.json"
+import germany from "./assets/germany.geo.json"
 
 const mapOptions = {
   zoomControl: false,
@@ -33,6 +35,8 @@ const mapOptions = {
   keyboard: false,
   boxZoom: false,
   attributionControl: false,
+  minZoom: 1,
+  maxZoom: 8
 }
 
 const mapRef = ref(null)
@@ -59,25 +63,44 @@ const geojsonOptions = (feature) => {
   }
 }
 
+function onZoom() {
+  const map = mapRef.value?.leafletObject
+  if (!map) return
+
+  map.eachLayer(layer => {
+    if (layer.setStyle) layer.setStyle(geojsonOptions(layer.feature))
+  })
+}
+
+function onZoomEnd() {
+  const map = mapRef.value?.leafletObject
+  if (!map) return
+
+  map.invalidateSize()
+}
+
 function toggleView() {
   const map = mapRef.value?.leafletObject
-
   if (!map) return
 
   if (!isGermanyView.value) {
-    map.flyTo([51, 10], 6, { duration: 2, easeLinearity: 0.25 })
 
-    setTimeout(() => {
-      isGermanyView.value = true
-    }, 2000)
-  }
-  
-  else {
-    map.flyTo([45, 0], 2, { duration: 2, easeLinearity: 0.25 })
-    
-    setTimeout(() => {
+    map.flyTo([51, 10], 6, { duration: 0.01, easeLinearity: 0.25 })
+
+    map.once("zoomend", () => {
+      isGermanyView.value = !isGermanyView.value
+      map.invalidateSize()
+      map.eachLayer(layer => {
+        if (layer.setStyle) layer.setStyle(geojsonOptions(layer.feature))
+      })
+    })
+  } else {
+    map.flyTo([45, 0], 2, { duration: 0.01, easeLinearity: 0.25 })
+
+    map.once("zoomend", () => {
       isGermanyView.value = false
-    }, 2000)
+      map.invalidateSize()
+    })
   }
 }
 </script>
