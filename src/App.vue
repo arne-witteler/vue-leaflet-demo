@@ -13,7 +13,7 @@
   :center="center"
   :options="mapOptions"
 >
-  <l-geo-json :geojson="geojson" :options-style="geojsonOptions" />
+  <l-geo-json :geojson="geojson" :options-style="geojsonOptions" :key="isGermanyView" />
 </l-map>
   </div>
 </template>
@@ -40,23 +40,44 @@ const isGermanyView = ref(false)
 const zoom = ref(2)
 const center = ref([45, 0])
 
-const geojsonOptions = () => ({
-    fillColor: "#C4D624",
-    weight: 1,
-    color: "#C4D624",
-    fillOpacity: 1,
-})
+const geojsonOptions = (feature) => {
+  const isGermany = feature?.properties?.name === "Germany"
+  if (isGermanyView.value) {
+    return {
+      fillColor: isGermany ? "#C4D624" : "#C4D624",
+      color: isGermany ? "#C4D624" : "#C4D624",
+      weight: 1,
+      fillOpacity: isGermany ? 1 : 0.5,
+    }
+  } else {
+    return {
+      fillColor: "#C4D624",
+      weight: 1,
+      color: "#C4D624",
+      fillOpacity: 1,
+    }
+  }
+}
 
 function toggleView() {
   const map = mapRef.value?.leafletObject
-  isGermanyView.value = !isGermanyView.value
 
-  if (map) {
-    if (isGermanyView.value) {
-      map.flyTo([51, 10], 6, { duration: 1 })
-    } else {
-      map.flyTo([45, 0], 2, { duration: 1 })
-    }
+  if (!map) return
+
+  if (!isGermanyView.value) {
+    map.flyTo([51, 10], 6, { duration: 2, easeLinearity: 0.25 })
+
+    setTimeout(() => {
+      isGermanyView.value = true
+    }, 2000)
+  }
+  
+  else {
+    map.flyTo([45, 0], 2, { duration: 2, easeLinearity: 0.25 })
+    
+    setTimeout(() => {
+      isGermanyView.value = false
+    }, 2000)
   }
 }
 </script>
@@ -92,5 +113,9 @@ body {
 }
 .toggle-button:hover {
   background-color: #d8e85a;
+}
+
+.leaflet-interactive {
+  transition: fill 1s ease, stroke 1s ease;
 }
 </style>
