@@ -15,7 +15,7 @@
   @zoom="onZoom"
   @zoomend="onZoomEnd"
 >
-  <l-geo-json :geojson="world" :options-style="geojsonOptions" :key="isGermanyView" />
+  <l-geo-json :geojson="isGermanyView ? germany : world" :options-style="geojsonOptions" :key="isGermanyView" />
 </l-map>
   </div>
 </template>
@@ -85,24 +85,15 @@ function toggleView() {
   if (!map) return
 
   if (!isGermanyView.value) {
-
-    map.flyTo([51, 10], 6, { duration: 1, easeLinearity: 0.25 })
-
-    map.once("zoomend", () => {
-      isGermanyView.value = !isGermanyView.value
-      map.invalidateSize()
-      map.eachLayer(layer => {
-        if (layer.setStyle) layer.setStyle(geojsonOptions(layer.feature))
-      })
-    })
+    map.setView([51, 10], 6)
+    isGermanyView.value = true
   } else {
-    map.flyTo([45, 0], 2, { duration: 1, easeLinearity: 0.25 })
-
-    map.once("zoomend", () => {
-      isGermanyView.value = false
-      map.invalidateSize()
-    })
+    map.setView([45, 0], 2)
+    isGermanyView.value = false
   }
+  map.eachLayer(layer => {
+    if (layer.setStyle) layer.setStyle(geojsonOptions(layer.feature))
+  })
 }
 </script>
 
