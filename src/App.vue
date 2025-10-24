@@ -35,6 +35,7 @@ const mapOptions = {
   keyboard: false,
   boxZoom: false,
   attributionControl: false,
+  zoomAnimation: false,
   minZoom: 1,
   maxZoom: 8
 }
@@ -85,7 +86,7 @@ function toggleView() {
 
   if (!isGermanyView.value) {
 
-    map.flyTo([51, 10], 6, { duration: 0.01, easeLinearity: 0.25 })
+    map.flyTo([51, 10], 6, { duration: 1, easeLinearity: 0.25 })
 
     map.once("zoomend", () => {
       isGermanyView.value = !isGermanyView.value
@@ -95,7 +96,7 @@ function toggleView() {
       })
     })
   } else {
-    map.flyTo([45, 0], 2, { duration: 0.01, easeLinearity: 0.25 })
+    map.flyTo([45, 0], 2, { duration: 1, easeLinearity: 0.25 })
 
     map.once("zoomend", () => {
       isGermanyView.value = false
